@@ -1,5 +1,7 @@
 package com.example.springboot;
 
+import com.example.springboot.Domain.MenuItem;
+import com.example.springboot.Repo.MenuItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,41 +18,30 @@ public class OrderReceiver {
     private float discount = 0;
 
 
-    private final float DISCOUNT_TEST = 5;
-    private float deliveryPrice = 30;
+    private final float DISCOUNT_PERCENT = 5;
+    private final float deliveryPrice = 30;
+
     private final Scanner scanner = new Scanner(System.in);
+
+    public String respond = "";
 
     Map<String, Integer> orderMap = new LinkedHashMap<>();
     ArrayList<MenuItem> orderedPizza = new ArrayList<>();
     ArrayList<MenuItem> freePizza = new ArrayList<>();
 
 
-    @Bean
-    public void orderPizza() {
-        recordOrder();
+//    public void orderPizza(String order) {
+//        recordOrder(order);
+//        specialOfferProposal(false);
+//        drinkPromotion(false);
+//        discountProgram(false);
+//        deliveryService(false);
+//        respond = printOrder(totalPrice, orderMap);
+//
+//    }
 
-        specialOfferProposal(true);
-
-        drinkPromotion(true);
-
-        discountProgram(true);
-
-        deliveryService(true);
-
-
-        printOrder(totalPrice, orderMap);
-
-    }
-
-    private void recordOrder() {
+    private void recordOrder(String order) {
         float orderPrice = 0;
-        boolean isOrdered = false;
-
-        while (!isOrdered) {
-            System.out.println("Enter your order: ");
-            String order = scanner.nextLine();
-
-            isOrdered = true;
 
             if(isOrderCorrect(order)) {
                 for (String item : order.split(" ")) {
@@ -66,10 +57,6 @@ public class OrderReceiver {
                         orderMap.put(item, 1);
                 }
             }
-            else {
-                isOrdered = false;
-            }
-        }
         totalPrice += orderPrice;
     }
 
@@ -91,7 +78,7 @@ public class OrderReceiver {
                 System.out.println("We have a special offer \"Each third pizza is free\". You may order one more pizza free.\n Print \"_yes\" for accept.\n Print \"_no\" for discard");
                 String answer = scanner.nextLine();
                 if (!answer.contains("_no"))
-                    recordOrder();
+                    recordOrder(""); //TODO
             }
             checkFreePizza();
         }
@@ -102,7 +89,7 @@ public class OrderReceiver {
             System.out.println("Your discount number: ");
             String answer = scanner.nextLine();
             if (answer.matches("\\d{6}"))
-                discount = totalPrice * DISCOUNT_TEST / 100;
+                discount = totalPrice * DISCOUNT_PERCENT / 100;
         }
     }
 
@@ -114,7 +101,7 @@ public class OrderReceiver {
                         "\n Print \"_yes\" for accept.\n Print \"_no\" for discard");
                 String answer = scanner.nextLine();
                 if (!answer.contains("_no"))
-                    recordOrder();
+                    recordOrder(""); //TODO
             }
         }
     }
@@ -133,7 +120,7 @@ public class OrderReceiver {
                 System.out.println("Maybe you want to order some drinks?\n Print \"_yes\" for accept.\n Print \"_no\" for discard");
                 String answer = scanner.nextLine();
                 if (!answer.contains("_no"))
-                    recordOrder();
+                    recordOrder(""); //TODO
             }
         }
     }
@@ -155,6 +142,7 @@ public class OrderReceiver {
             }
         }
     }
+
     public static Comparator getCompByName()
     {
         return (Comparator<MenuItem>) (o1, o2) -> Float.compare(o2.getPrice(), o1.getPrice());
@@ -169,26 +157,29 @@ public class OrderReceiver {
             return -1;
     }
 
+    public String printOrder(String order) {
+        if(isOrderCorrect(order)) {
+            recordOrder(order);
+            String result = "";
+            result += "Your order is: ";
+            for (Map.Entry<String, Integer> entry : orderMap.entrySet())
+                result += entry.getValue() + " " + entry.getKey();
 
-    private void printOrder(float totalPrice, Map<String, Integer> orderMap) {
-        System.out.println("Your order is: ");
-        for (Map.Entry<String, Integer> entry : orderMap.entrySet())
-            System.out.println(entry.getValue() + " " + entry.getKey());
+            if (!isFreeDelivery())
+                totalPrice += deliveryPrice;
 
-        if(isFreeDelivery())
-            deliveryPrice = 0;
-        else
-            deliveryPrice = 30;
+            totalPrice -= discount;
 
-        totalPrice += deliveryPrice;
-        totalPrice -= discount;
+            result += "Discount: " + discount +
+                    "\nDelivery: " + deliveryPrice +
+                    "\nTotal price is: " + String.format("%.2f", totalPrice);
 
-        System.out.println("Discount: " + discount +
-                "\nDelivery: " + deliveryPrice +
-                "\nTotal price is: " + String.format("%.2f", totalPrice));
+            if (freePizza.size() > 0)
+                result += "You got for free: " + freePizza;
 
-        if(freePizza.size() > 0)
-            System.out.println("You got for free: " + freePizza);
+            return result;
+        }
+        else return "incorrect";
     }
 
 }
