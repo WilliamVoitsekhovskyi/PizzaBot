@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface ChatMessageRepository extends CrudRepository<ChatMessage, Integer> {
     List<ChatMessage> findAll();
-    boolean existsByContent(String content);
 }

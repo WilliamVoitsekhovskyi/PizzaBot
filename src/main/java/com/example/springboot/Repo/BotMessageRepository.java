@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface BotMessageRepository extends CrudRepository<BotMessage, Integer> {
     List<BotMessage> findAll();
-    boolean existsByContent(String content);
 }

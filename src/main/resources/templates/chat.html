@@ -2,26 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8">
-	<!--  This file has been downloaded from bootdey.com    @bootdey on twitter -->
-	<!--  All snippets are MIT license http://bootdey.com/license -->
 	<title>Pizza Bot</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 	<link th:href="@{/main.css}" rel="stylesheet" />
-
 </head>
+
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
 <div class="container">
 		<div class="panel">
 			<!--Widget body-->
-				<div class="nano has-scrollbar" style="height:380px">
+				<div class="nano has-scrollbar" style="height:800px">
 					<div class="nano-content pad-all" tabindex="0" style="right: -17px;">
-						<div>Hi, please enter your order!</div>
+						<div class="text-center">Hi, please enter your order! If you have the discount card, please enter 6-digit code first!</div>
 						<ul class="list-unstyled media-block" th:each="chatMessage : ${messages}">
 							<li class="mar-btm">
-								<div class="media-body pad-hor" >
+								<div class="media-body pad-hor">
 									<div class="speech">
 										<a href="#" class="media-heading">You</a>
 										<p th:text="${chatMessage.key.content}"></p>
