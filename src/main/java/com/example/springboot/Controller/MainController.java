@@ -40,7 +40,7 @@ public class MainController {
         chatMessageRepository.save(chatMessage);
 
         BotMessage botMessage = new BotMessage();
-        botMessage.setContent(orderReceiver.printOrder(chatMessage.getContent()));
+        botMessage.setContent(orderReceiver.getResponse(chatMessage.getContent()));
         botMessageRepository.save(botMessage);
 
         messages.put(chatMessage, botMessage);

@@ -23,9 +23,9 @@ public class OrderReceiver {
     
     private String incorrectMessage;
     
-    private final StringBuilder result = new StringBuilder();
+    private final StringBuilder responseToCustomer = new StringBuilder();
 
-    Map<String, Integer> orderMap = new LinkedHashMap<>();
+    Map<String, Integer> orderedItemsByAmountMap = new LinkedHashMap<>(); //String - item name
     ArrayList<MenuItem> orderedPizza = new ArrayList<>();
     ArrayList<MenuItem> freePizza = new ArrayList<>();
     
@@ -40,12 +40,12 @@ public class OrderReceiver {
                     if (menuItem.getName().contains("pizza"))
                         orderedPizza.add(menuItem);
 
-                    if (orderMap.containsKey(item)) {
-                        amountOfThisItemInMap = orderMap.get(item);
-                        orderMap.put(item, amountOfThisItemInMap + 1);
+                    if (orderedItemsByAmountMap.containsKey(item)) {
+                        amountOfThisItemInMap = orderedItemsByAmountMap.get(item);
+                        orderedItemsByAmountMap.put(item, amountOfThisItemInMap + 1);
                     }
                     else
-                        orderMap.put(item, 1); //if the item wasn't in map before we set amount 1 of this item by default
+                        orderedItemsByAmountMap.put(item, 1); //if the item wasn't in map before we set amount 1 of this item by default
                 }
             }
     }
@@ -69,10 +69,6 @@ public class OrderReceiver {
             }
             else
                 return null;
-    }
-
-    private void addDiscount(){
-                discount = totalPrice * DISCOUNT_PERCENT / 100;
     }
 
     private String deliveryService(){
@@ -101,15 +97,14 @@ public class OrderReceiver {
     }
 
     private boolean isOrderContainsDrinks() {
-        for (Map.Entry<String, Integer> entry : orderMap.entrySet()) {
-            if(menuItemRepository.findByName(entry.getKey()).getType().equals("drink")) {
+        for (Map.Entry<String, Integer> entry : orderedItemsByAmountMap.entrySet()) {
+            if(menuItemRepository.findByName(entry.getKey()).getType().equals("drink"))
                 return true;
-            }
         }
         return false;
     }
 
-    private void checkFreePizza(){
+    private void checkIsOrderContainsFreePizza(){
         for (int i = 1; i <= orderedPizza.size(); i++) {
             if (isFreePizza(i) == 1) {
                 orderedPizza.sort(getCompByName());
@@ -132,7 +127,7 @@ public class OrderReceiver {
         return (o1, o2) -> Float.compare(o2.getPrice(), o1.getPrice());
     }
 
-    public String printOrder(String order) {
+    public String getResponse(String order) {
         if(order.matches("\\d{6}") && !isDiscountAlreadyEnabled) {
             isDiscountAlreadyEnabled = true;
             return "Discount added!";
@@ -160,16 +155,20 @@ public class OrderReceiver {
             return incorrectMessage;
     }
 
+    private void addDiscount(){
+        discount = totalPrice * DISCOUNT_PERCENT / 100;
+    }
+
     private String getOrder(){
         float deliveryPrice;
 
-        checkFreePizza();
+        checkIsOrderContainsFreePizza();
 
-        result.setLength(0);
-        result.append("Your order is: ");
+        responseToCustomer.setLength(0);
+        responseToCustomer.append("Your order is: ");
 
-        for (Map.Entry<String, Integer> entry : orderMap.entrySet())
-            result.append(entry.getValue()).append(" ").append(entry.getKey()).append(" ");
+        for (Map.Entry<String, Integer> entry : orderedItemsByAmountMap.entrySet())
+            responseToCustomer.append(entry.getValue()).append(" ").append(entry.getKey()).append(" ");
 
         if (isFreeDelivery())
             deliveryPrice = 0;
@@ -182,13 +181,13 @@ public class OrderReceiver {
         totalPrice -= discount;
         totalPrice += deliveryPrice;
 
-        result.append("\nDiscount: ").append(String.format("%.2f", discount))
+        responseToCustomer.append("\nDiscount: ").append(String.format("%.2f", discount))
                 .append("\nDelivery: ").append(deliveryPrice)
                 .append("\nTotal price is: ").append(String.format("%.2f", totalPrice));
 
         if (freePizza.size() > 0)
-            result.append("\nYou got for free: ").append(freePizza);
+            responseToCustomer.append("\nYou got for free: ").append(freePizza);
 
-        return result.toString();
+        return responseToCustomer.toString();
     }
 }
