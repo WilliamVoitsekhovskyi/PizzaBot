@@ -2,27 +2,29 @@ package com.example.springboot.OrderReciever;
 
 import com.example.springboot.Domain.MenuItem;
 import com.example.springboot.Repo.MenuItemRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.*;
 
 @SpringBootApplication
-public class OrderReceiver {
+public class Order {
 
     @Autowired
     private MenuItemRepository menuItemRepository;
 
     private final float DISCOUNT_PERCENT = 5;
     private final float DELIVERY_PRICE = 30;
-    
+
     private float totalPrice = 0;
     private float discount = 0;
 
     private boolean isDiscountAlreadyEnabled = false;
     
     private String incorrectMessage;
-    
+    private final String code = RandomStringUtils.random(8, "0123456789abcdef");
+
     private final StringBuilder responseToCustomer = new StringBuilder();
 
     Map<String, Integer> orderedItemsByAmountMap = new LinkedHashMap<>(); //String - item name
@@ -181,13 +183,25 @@ public class OrderReceiver {
         totalPrice -= discount;
         totalPrice += deliveryPrice;
 
-        responseToCustomer.append("\nDiscount: ").append(String.format("%.2f", discount))
-                .append("\nDelivery: ").append(deliveryPrice)
-                .append("\nTotal price is: ").append(String.format("%.2f", totalPrice));
-
         if (freePizza.size() > 0)
             responseToCustomer.append("\nYou got for free: ").append(freePizza);
 
-        return responseToCustomer.toString();
+        return responseToCustomer.toString().trim();
+    }
+
+    public float getTotalPrice() {
+        return totalPrice;
+    }
+
+    public float getDiscount() {
+        return discount;
+    }
+
+    public float getDELIVERY_PRICE() {
+        return DELIVERY_PRICE;
+    }
+
+    public String getCode(){
+        return code;
     }
 }

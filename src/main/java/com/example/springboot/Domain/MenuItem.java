@@ -7,13 +7,13 @@ import javax.persistence.*;
 public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private long id;
 
     private String name;
     private float price;
     private String type;
 
-    public MenuItem(Integer id, String name, float price, String type) {
+    public MenuItem(long id, String name, float price, String type) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -48,7 +48,7 @@ public class MenuItem {
         this.type = type;
     }
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 

@@ -3,27 +3,28 @@ package com.example.springboot.Domain;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 @Entity
-@Table(name = "chat_message")
-public class ChatMessage {
+@Table(name = "customer_message")
+public class CustomerMessage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private long id;
 
     private String content;
     private final String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
-    public ChatMessage(String content) {
+    public CustomerMessage(long id, String content) {
+        this.id = id;
         this.content = content;
     }
 
-    public ChatMessage(){
+    public CustomerMessage() {
 
     }
 
     @Override
     public String toString() {
-        return "ChatMessage{" +
+        return "Message{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
                 ", time='" + time + '\'' +
@@ -38,15 +39,12 @@ public class ChatMessage {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id){
         this.id = id;
     }
+
 }
